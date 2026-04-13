@@ -30,8 +30,8 @@ private:
 
 public:
     template <class T>
-    AnyClient(T& obj)
-        : self_(std::make_unique<Model<T>>(obj)) {}
+    AnyClient(T obj)
+        : self_(std::make_unique<Model<T>>(std::move(obj))) {}
 
     void foo() {
         self_->foo();

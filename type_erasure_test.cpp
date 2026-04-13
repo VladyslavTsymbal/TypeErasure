@@ -21,8 +21,8 @@ TEST(SomeClassTest, CallsFoo) {
     EXPECT_CALL(*mock, foo()).Times(1);
     EXPECT_CALL(*mock, fooInt()).WillOnce(testing::Return(10));
 
-    AnyClient mock_client_wrapper(mock);
-    AnyClient client_wrapper(client);
+    AnyClient mock_client_wrapper(std::move(mock));
+    AnyClient client_wrapper(std::move(client));
 
     SomeClassThatUsesMyClient sut{std::move(mock_client_wrapper)};
     SomeClassThatUsesMyClient another{std::move(client_wrapper)};
