@@ -1,27 +1,31 @@
-
 #include "mock_client.hpp"
 #include "client.hpp"
 
 class SomeClassThatUsesMyClient {
 public:
-    explicit SomeClassThatUsesMyClient(AnyClientRef client)
+    explicit SomeClassThatUsesMyClient(AnyClient client)
         : client_(std::move(client)) {}
 
     void run() {
         client_.foo();
+        (void)client_.fooInt();
     }
 
 private:
-    AnyClientRef client_;
+    AnyClient client_;
 };
 
 TEST(SomeClassTest, CallsFoo) {
-    MockClient mock;
+    MockWrap mock;
     RealClient client;
-    EXPECT_CALL(mock, foo()).Times(1);
+    EXPECT_CALL(*mock, foo()).Times(1);
+    EXPECT_CALL(*mock, fooInt()).WillOnce(testing::Return(10));
 
-    SomeClassThatUsesMyClient sut{AnyClientRef(mock)};
-    SomeClassThatUsesMyClient another{AnyClientRef(client)};
+    AnyClient mock_client_wrapper(mock);
+    AnyClient client_wrapper(client);
+
+    SomeClassThatUsesMyClient sut{std::move(mock_client_wrapper)};
+    SomeClassThatUsesMyClient another{std::move(client_wrapper)};
 
     sut.run();
     another.run();
